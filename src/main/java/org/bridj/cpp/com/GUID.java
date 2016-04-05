@@ -104,4 +104,9 @@ public class GUID extends StructObject {
     public Pointer<Byte> Data4() {
         return this.io.getPointerField(this, 3);
     }
+	
+	@Override
+	public String toString() {
+		return String.format("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X", Data1(), Data2(), Data3(), Data4().get(0), Data4().get(1), Data4().get(2), Data4().get(3), Data4().get(4), Data4().get(5), Data4().get(6), Data4().get(7));
+	}
 }
