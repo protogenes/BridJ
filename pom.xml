@@ -141,6 +141,7 @@
 							org.bridj.ann,
 							org.bridj.cpp,
 							org.bridj.cpp.com,
+							org.bridj.cpp.com.idl,
 							org.bridj.cpp.com.shell,
 							org.bridj.cpp.mfc,
 							org.bridj.cpp.std,

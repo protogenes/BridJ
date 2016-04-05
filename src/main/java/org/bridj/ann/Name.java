@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
  *
  * @author Olivier Chafik
  */
-@Target({ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.METHOD, ElementType.TYPE, ElementType.PARAMETER, ElementType.PACKAGE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Name {
     String value();
