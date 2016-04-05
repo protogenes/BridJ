@@ -29,20 +29,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.bridj;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import org.bridj.ann.Virtual;
+import org.bridj.cpp.com.*;
+import org.bridj.cpp.com.shell.IShellWindows;
+import org.junit.Test;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bridj.ann.Virtual;
-import org.bridj.cpp.com.CLSID;
-import org.bridj.cpp.com.COMRuntime;
-import org.bridj.cpp.com.IID;
-import org.bridj.cpp.com.IUnknown;
-import org.bridj.cpp.com.VARIANT;
-import org.bridj.cpp.com.shell.IShellWindows;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class COMTest {
 
@@ -71,7 +67,7 @@ public class COMTest {
 	static class SomeUnknown extends IUnknown {
 		//public SomeUnknown() {}
 		@Override
-		public int QueryInterface(Pointer<Byte> riid, Pointer<Pointer<IUnknown>> ppvObject) {
+		public int QueryInterface(Pointer<GUID> riid, Pointer<Pointer<IUnknown>> ppvObject) {
 			return 0;
 		}
 		int refs;

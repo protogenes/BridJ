@@ -99,7 +99,7 @@ public class IDispatch extends IUnknown {
 
     @Virtual(2)
     public native int GetIDsOfNames(
-            Pointer riid,//REFIID riid,
+            Pointer<GUID> riid,//REFIID riid,
             Pointer<Pointer<Character>> rgszNames,
             int cNames,
             int lcid, //LCID lcid,
@@ -108,7 +108,7 @@ public class IDispatch extends IUnknown {
     @Virtual(3)
     public native int Invoke(
             int dispIdMember,
-            Pointer<Byte> riid,
+            Pointer<GUID> riid,
             int lcid,
             short wFlags,
             Pointer<DISPPARAMS> pDispParams,

@@ -43,7 +43,7 @@ public class IClassFactory extends IUnknown {
     @Deprecated
     public native int CreateInstance(
             Pointer<IUnknown> pUnkOuter,
-            Pointer<Byte> riid,
+            Pointer<GUID> riid,
             Pointer<Pointer<IUnknown>> ppvObject);
 
     public <I extends IUnknown> I CreateInstance(Class<I> type) {

@@ -177,10 +177,10 @@ public class COMRuntime extends CPPRuntime {
 
     @Deprecated
     public static native int CoCreateInstance(
-            Pointer<Byte> rclsid,
+            Pointer<GUID> rclsid,
             Pointer<IUnknown> pUnkOuter,
             int dwClsContext,
-            Pointer<Byte> riid,
+            Pointer<GUID> riid,
             Pointer<Pointer<?>> ppv);
 
     static native int CoInitializeEx(@Ptr long pvReserved, int dwCoInit);
@@ -219,13 +219,13 @@ public class COMRuntime extends CPPRuntime {
      *
      * @throws RuntimeException if the class isn't annotated with IID
      */
-    public static <I extends IUnknown> Pointer<Byte> getIID(Class<I> type) {
+    public static <I extends IUnknown> Pointer<GUID> getIID(Class<I> type) {
         IID id = type.getAnnotation(IID.class);
         if (id == null) {
             throw new RuntimeException("No " + IID.class.getName() + " annotation set on type " + type.getName() + " !");
         }
 
-        return (Pointer) parseGUID(id.value());
+        return parseGUID(id.value());
     }
 
     /**
@@ -233,13 +233,13 @@ public class COMRuntime extends CPPRuntime {
      *
      * @throws RuntimeException if the class isn't annotated with CLSID
      */
-    public static <I extends IUnknown> Pointer<Byte> getCLSID(Class<I> type) {
+    public static <I extends IUnknown> Pointer<GUID> getCLSID(Class<I> type) {
         CLSID id = type.getAnnotation(CLSID.class);
         if (id == null) {
             throw new RuntimeException("No " + CLSID.class.getName() + " annotation set on type " + type.getName() + " !");
         }
 
-        return (Pointer) parseGUID(id.value());
+        return parseGUID(id.value());
     }
     static ThreadLocal<Object> comInitializer = new ThreadLocal<Object>() {
         @Override
@@ -278,13 +278,13 @@ public class COMRuntime extends CPPRuntime {
         initialize();
 
         Pointer<Pointer<?>> p = Pointer.allocatePointer();
-        Pointer<Byte> clsid = getCLSID(instanceClass), uuid = getIID(instanceInterface);
+        Pointer<GUID> clsid = getCLSID(instanceClass), uuid = getIID(instanceInterface);
         try {
             int ret = CoCreateInstance(clsid, null, CLSCTX_ALL, uuid, p);
             if (ret == REGDB_E_CLASSNOTREG) {
                 throw new ClassNotFoundException("COM class is not registered : " + instanceClass.getSimpleName() + " (clsid = " + clsid.getCString() + ")");
             }
-            error(ret);
+	        error(ret);
 
             Pointer<?> inst = p.getPointer();
             if (inst == null) {
@@ -350,7 +350,7 @@ public class COMRuntime extends CPPRuntime {
     private static final String model = "00000000-0000-0000-0000-000000000000";
 
     // Need to parse as (int, short, short, char[8])
-    public static Pointer<?> parseGUID(String descriptor) {
+    public static Pointer<GUID> parseGUID(String descriptor) {
         Pointer<?> out = Pointer.allocateBytes(16 + 4);
         descriptor = descriptor.replaceAll("-", "");
         if (descriptor.length() != 32) {
@@ -364,7 +364,7 @@ public class COMRuntime extends CPPRuntime {
             out.setByteAtOffset(8 + i, (byte) Long.parseLong(descriptor.substring(16 + i * 2, 16 + i * 2 + 2), 16));
         }
 
-        return out;
+        return out.as(GUID.class);
     }
 
     static ValuedEnum<VARENUM> getType(VARIANT v) {

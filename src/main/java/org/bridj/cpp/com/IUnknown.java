@@ -65,7 +65,7 @@ public class IUnknown extends CPPObject {
     @Virtual(0)
     @Deprecated
     public native int QueryInterface(
-            Pointer<Byte> riid,
+            Pointer<GUID> riid,
             Pointer<Pointer<IUnknown>> ppvObject);
 
     public <I extends IUnknown> I QueryInterface(Class<I> type) {
