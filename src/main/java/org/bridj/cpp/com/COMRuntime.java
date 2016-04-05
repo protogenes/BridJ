@@ -30,39 +30,8 @@
  */
 package org.bridj.cpp.com;
 
-import static org.bridj.Pointer.getPointer;
-import static org.bridj.cpp.com.OLEAutomationLibrary.VariantChangeType;
-import static org.bridj.cpp.com.OLEAutomationLibrary.VariantClear;
-import static org.bridj.cpp.com.OLEAutomationLibrary.VariantCopy;
-import static org.bridj.cpp.com.OLEAutomationLibrary.VariantInit;
-import static org.bridj.cpp.com.OLELibrary.CoTaskMemAlloc$raw;
-import static org.bridj.cpp.com.OLELibrary.CoTaskMemFree;
-import static org.bridj.cpp.com.VARENUM.VT_BOOL;
-import static org.bridj.cpp.com.VARENUM.VT_BSTR;
-import static org.bridj.cpp.com.VARENUM.VT_BYREF;
-import static org.bridj.cpp.com.VARENUM.VT_EMPTY;
-import static org.bridj.cpp.com.VARENUM.VT_I1;
-import static org.bridj.cpp.com.VARENUM.VT_I2;
-import static org.bridj.cpp.com.VARENUM.VT_I4;
-import static org.bridj.cpp.com.VARENUM.VT_I8;
-import static org.bridj.cpp.com.VARENUM.VT_LPWSTR;
-import static org.bridj.cpp.com.VARENUM.VT_PTR;
-import static org.bridj.cpp.com.VARENUM.VT_R4;
-import static org.bridj.cpp.com.VARENUM.VT_R8;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-
-import org.bridj.BridJ;
-import org.bridj.CRuntime;
-import org.bridj.FlagSet;
-import org.bridj.NativeObject;
-import org.bridj.Platform;
-import org.bridj.Pointer;
-import org.bridj.Pointer.StringType;
-import org.bridj.PointerIO;
-import org.bridj.StructObject;
-import org.bridj.ValuedEnum;
+import org.bridj.*;
+import org.bridj.Pointer.*;
 import org.bridj.ann.Convention;
 import org.bridj.ann.Library;
 import org.bridj.ann.Ptr;
@@ -72,7 +41,20 @@ import org.bridj.cpp.CPPRuntime;
 import org.bridj.cpp.com.VARIANT.__VARIANT_NAME_1_union;
 import org.bridj.cpp.com.VARIANT.__VARIANT_NAME_1_union.__tagVARIANT;
 import org.bridj.cpp.com.VARIANT.__VARIANT_NAME_1_union.__tagVARIANT.__VARIANT_NAME_3_union;
+import org.bridj.cpp.com.dispatch.CONNECTDATA;
+import org.bridj.cpp.com.dispatch.IConnectionPoint;
+import org.bridj.cpp.com.dispatch.IConnectionPointContainer;
+import org.bridj.cpp.com.dispatch.IEnumConnections;
 import org.bridj.util.Utils;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+
+import static org.bridj.Pointer.*;
+import static org.bridj.cpp.com.COMStatus.*;
+import static org.bridj.cpp.com.OLEAutomationLibrary.*;
+import static org.bridj.cpp.com.OLELibrary.*;
+import static org.bridj.cpp.com.VARENUM.*;
 
 /*
  * Adding Icons, Previews and Shortcut Menus :
@@ -133,39 +115,6 @@ public class COMRuntime extends CPPRuntime {
             | CLSCTX_LOCAL_SERVER
             | CLSCTX_REMOTE_SERVER),
             CLSCTX_SERVER = (CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER | CLSCTX_REMOTE_SERVER);
-    public static final int S_OK = 0,
-            S_FALSE = 1,
-            REGDB_E_CLASSNOTREG = 0x80040154,
-            CLASS_E_NOAGGREGATION = 0x80040110,
-            CO_E_NOTINITIALIZED = 0x800401F0;
-    public static final int E_UNEXPECTED = 0x8000FFFF;
-    public static final int E_NOTIMPL = 0x80004001;
-    public static final int E_OUTOFMEMORY = 0x8007000E;
-    public static final int E_INVALIDARG = 0x80070057;
-    public static final int E_NOINTERFACE = 0x80004002;
-    public static final int E_POINTER = 0x80004003;
-    public static final int E_HANDLE = 0x80070006;
-    public static final int E_ABORT = 0x80004004;
-    public static final int E_FAIL = 0x80004005;
-    public static final int E_ACCESSDENIED = 0x80070005;
-    public static final int DISP_E_BADVARTYPE = -2147352568;
-    public static final int DISP_E_NOTACOLLECTION = -2147352559;
-    public static final int DISP_E_MEMBERNOTFOUND = -2147352573;
-    public static final int DISP_E_ARRAYISLOCKED = -2147352563;
-    public static final int DISP_E_EXCEPTION = -2147352567;
-    public static final int DISP_E_TYPEMISMATCH = -2147352571;
-    public static final int DISP_E_BADINDEX = -2147352565;
-    public static final int DISP_E_BADCALLEE = -2147352560;
-    public static final int DISP_E_OVERFLOW = -2147352566;
-    public static final int DISP_E_UNKNOWNINTERFACE = -2147352575;
-    public static final int DISP_E_DIVBYZERO = -2147352558;
-    public static final int DISP_E_UNKNOWNLCID = -2147352564;
-    public static final int DISP_E_PARAMNOTOPTIONAL = -2147352561;
-    public static final int DISP_E_PARAMNOTFOUND = -2147352572;
-    public static final int DISP_E_BADPARAMCOUNT = -2147352562;
-    public static final int DISP_E_BUFFERTOOSMALL = -2147352557;
-    public static final int DISP_E_UNKNOWNNAME = -2147352570;
-    public static final int DISP_E_NONAMEDARGS = -2147352569;
 
     public static interface COINIT {
 
@@ -188,31 +137,6 @@ public class COMRuntime extends CPPRuntime {
     static native int CoInitialize(@Ptr long pvReserved);
 
     static native void CoUninitialize();
-
-    static void error(int err) {
-        switch (err) {
-            case S_OK:
-                return;
-            case E_UNEXPECTED:
-                throw new RuntimeException("Unexpected error");
-            case E_OUTOFMEMORY:
-                throw new RuntimeException("Memory could not be allocated.");
-            case CO_E_NOTINITIALIZED:
-                throw new RuntimeException("CoInitialized wasn't called !!");
-            case E_NOINTERFACE:
-                throw new RuntimeException("Interface does not inherit from class");
-            case E_POINTER:
-                throw new RuntimeException("Allocated pointer pointer is null !!");
-            case DISP_E_ARRAYISLOCKED:
-                throw new RuntimeException("The variant contains an array that is locked.");
-            case DISP_E_BADVARTYPE:
-                throw new RuntimeException("The variant type is not valid.");
-            case E_INVALIDARG:
-                throw new RuntimeException("One of the arguments is invalid.");
-            default:
-                throw new RuntimeException("Unexpected COM error code : " + err);
-        }
-    }
 
     /**
      * Get the IID declared for a class using the {@link IID} annotation.
@@ -244,7 +168,7 @@ public class COMRuntime extends CPPRuntime {
     static ThreadLocal<Object> comInitializer = new ThreadLocal<Object>() {
         @Override
         protected Object initialValue() {
-            error(CoInitializeEx(0, COINIT.COINIT_MULTITHREADED));
+            COMStatus.check(CoInitializeEx(0, COINIT.COINIT_MULTITHREADED));
             return new Object() {
                 @Override
                 protected void finalize() throws Throwable {
@@ -284,7 +208,7 @@ public class COMRuntime extends CPPRuntime {
             if (ret == REGDB_E_CLASSNOTREG) {
                 throw new ClassNotFoundException("COM class is not registered : " + instanceClass.getSimpleName() + " (clsid = " + clsid.getCString() + ")");
             }
-	        error(ret);
+	        COMStatus.check(ret);
 
             Pointer<?> inst = p.getPointer();
             if (inst == null) {
@@ -305,7 +229,7 @@ public class COMRuntime extends CPPRuntime {
         }
         Pointer.Releaser VARIANTReleaser = new Pointer.Releaser() {
             public void release(Pointer<?> p) {
-                error(VariantClear((Pointer<VARIANT>) p));
+	            COMStatus.check(VariantClear((Pointer<VARIANT>) p));
             }
         };
 
@@ -579,7 +503,7 @@ public class COMRuntime extends CPPRuntime {
             return null;
         }
         VARIANT clone = new VARIANT();
-        error(VariantCopy(getPointer(clone), getPointer(instance)));
+	    COMStatus.check(VariantCopy(getPointer(clone), getPointer(instance)));
         return clone;
     }
 
