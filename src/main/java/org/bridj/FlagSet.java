@@ -32,13 +32,7 @@ package org.bridj;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.WeakHashMap;
+import java.util.*;
 
 /**
  * Set of int-valued enum values that is itself int-valued (bitwise OR of all
@@ -98,25 +92,11 @@ public class FlagSet<E extends Enum<E> & ValuedEnum<E>> implements ValuedEnum<E>
     }
 
     public E toEnum() {
-        E nullMatch = null;
-        E match = null;
-        for (E e : getMatchingEnums()) {
-            if (((ValuedEnum<?>) e).value() == 0) {
-                nullMatch = e;
-            } else if (match == null) {
-                match = e;
-            } else {
-                throw new NoSuchElementException("More than one enum value corresponding to " + this + " : " + e + " and " + match + "...");
+        for (E e : getValues(enumClass)) {
+            if (e.value() == value) {
+                return e;
             }
         }
-        if (match != null) {
-            return match;
-        }
-
-        if (value() == 0) {
-            return nullMatch;
-        }
-
         throw new NoSuchElementException("No enum value corresponding to " + this);
     }
 
