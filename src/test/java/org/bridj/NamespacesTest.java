@@ -29,20 +29,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.bridj;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Collections;
-import java.util.Iterator;
-
-import org.bridj.ann.Constructor;
-import org.bridj.ann.Field;
-import org.bridj.ann.Library;
-import org.bridj.ann.Name;
-import org.bridj.ann.Namespace;
+import org.bridj.ann.*;
 import org.bridj.ann.Runtime;
 import org.bridj.cpp.CPPObject;
 import org.bridj.cpp.CPPRuntime;
 import org.junit.Test;
+
+import java.util.Collections;
+import java.util.Iterator;
+
+import static org.junit.Assert.*;
 
 @Library("test") 
 @Runtime(CPPRuntime.class) 
@@ -79,11 +75,11 @@ public class NamespacesTest {
         public native int renamedGetValue();
         
         @Name("getEnumValuePlus1")
-        public native int incrementedEnumValue(IntValuedEnum<RenamedEnum> e);
+        public native int incrementedEnumValue(ValuedEnum<org.bridj.NamespacesTest.RenamedEnum> e);
 	};
     @Namespace("com::nativelibs4java::bridj") 
     @Name("FullyNamespacedEnum")
-    public enum RenamedEnum implements IntValuedEnum<RenamedEnum > {
+    public enum RenamedEnum implements ValuedEnum<RenamedEnum > {
 		A(0),
 		B(1),
 		C(2);
@@ -97,7 +93,7 @@ public class NamespacesTest {
 		public Iterator<RenamedEnum > iterator() {
 			return Collections.singleton(this).iterator();
 		}
-		public static IntValuedEnum<RenamedEnum > fromValue(int value) {
+		public static ValuedEnum<org.bridj.NamespacesTest.RenamedEnum> fromValue(int value) {
 			return FlagSet.fromValue(value, values());
 		}
 	};

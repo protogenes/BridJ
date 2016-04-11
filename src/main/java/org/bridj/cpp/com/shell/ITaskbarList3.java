@@ -30,25 +30,21 @@
  */
 package org.bridj.cpp.com.shell;
 
-import java.util.Collections;
-import java.util.Iterator;
-
-import org.bridj.FlagSet;
-import org.bridj.IntValuedEnum;
-import org.bridj.Pointer;
-import org.bridj.StructObject;
-import org.bridj.ValuedEnum;
+import org.bridj.*;
 import org.bridj.ann.Array;
 import org.bridj.ann.Field;
 import org.bridj.ann.Virtual;
 import org.bridj.cpp.com.CLSID;
 import org.bridj.cpp.com.IID;
 
+import java.util.Collections;
+import java.util.Iterator;
+
 @IID("EA1AFB91-9E28-4B86-90E9-9E9F8A5EEFAF")
 @CLSID("56FDF344-FD6D-11d0-958A-006097C9A090")
 public class ITaskbarList3 extends ITaskbarList2 {
 
-    public enum THUMBBUTTONMASK implements IntValuedEnum<THUMBBUTTONMASK> {
+    public enum THUMBBUTTONMASK implements ValuedEnum<THUMBBUTTONMASK> {
 
         THB_BITMAP(0x00000001),
         THB_ICON(0x00000002),
@@ -75,7 +71,7 @@ public class ITaskbarList3 extends ITaskbarList2 {
     }
     /// http://msdn.microsoft.com/en-us/library/dd562321(VS.85).aspx
 
-    public enum THUMBBUTTONFLAGS implements IntValuedEnum<THUMBBUTTONFLAGS> {
+    public enum THUMBBUTTONFLAGS implements ValuedEnum<THUMBBUTTONFLAGS> {
 
         THBF_ENABLED(0x00000000),
         THBF_DISABLED(0x00000001),
@@ -140,7 +136,7 @@ public class ITaskbarList3 extends ITaskbarList2 {
     @Virtual(0)
     public native int SetProgressValue(Pointer<Integer> hWnd, long Completed, long Total);
 
-    public enum TbpFlag implements IntValuedEnum<TbpFlag> {
+    public enum TbpFlag implements ValuedEnum<TbpFlag> {
 
         TBPF_NOPROGRESS(0),
         TBPF_INDETERMINATE(1),

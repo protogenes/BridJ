@@ -30,13 +30,11 @@
  */
 package org.bridj;
 
-import static org.bridj.BridJ.sizeOf;
-import static org.bridj.Pointer.allocateArray;
-import static org.bridj.Pointer.getPointer;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.bridj.ann.*;
+import org.bridj.cpp.com.DECIMAL;
+import org.bridj.cpp.com.GUID;
+import org.bridj.cpp.com.VARIANT;
+import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -44,17 +42,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bridj.ann.Alignment;
-import org.bridj.ann.Array;
-import org.bridj.ann.Field;
-import org.bridj.ann.Library;
-import org.bridj.ann.Optional;
-import org.bridj.ann.Ptr;
-import org.bridj.ann.Struct;
-import org.bridj.cpp.com.DECIMAL;
-import org.bridj.cpp.com.GUID;
-import org.bridj.cpp.com.VARIANT;
-import org.junit.Test;
+import static org.bridj.BridJ.*;
+import static org.bridj.Pointer.*;
+import static org.junit.Assert.*;
 
 ///http://www.codesourcery.com/public/cxx-abi/cxx-vtable-ex.html
 
@@ -838,7 +828,7 @@ public class StructTest {
     }
     
     public static class EnumsStruct extends StructObject {
-        public enum E implements IntValuedEnum<E > {
+        public enum E implements ValuedEnum<E > {
             A(0),
             B(1),
             C(2);
@@ -858,14 +848,14 @@ public class StructTest {
         };
         @Array(5)
         @Field(0)
-        public Pointer<IntValuedEnum<E>> p;
+        public Pointer<ValuedEnum<org.bridj.StructTest.EnumsStruct.E>> p;
     }
     @Test
     public void testEnumsStruct() {
-        assertEquals(5 * BridJ.sizeOf(IntValuedEnum.class), BridJ.sizeOf(EnumsStruct.class));
+        assertEquals(5 * BridJ.sizeOf(ValuedEnum.class), BridJ.sizeOf(EnumsStruct.class));
     }
     
-    public enum cec_device_type implements IntValuedEnum<cec_device_type> {
+    public enum cec_device_type implements ValuedEnum<cec_device_type> {
 
         A, B;
 
@@ -885,7 +875,7 @@ public class StructTest {
        /// C type : cec_device_type[5]
        @Array({5})
        @Field(0)
-       public Pointer<IntValuedEnum<cec_device_type > > types() {
+       public Pointer<ValuedEnum<org.bridj.StructTest.cec_device_type>> types() {
                return this.io.getPointerField(this, 0);
        }
     }
@@ -894,7 +884,7 @@ public class StructTest {
     public void testEnumsFieldRegression() {
         Pointer<cec_device_type_list> pDeviceTypeList = Pointer.getPointer(new cec_device_type_list());
         cec_device_type_list deviceTypeList = pDeviceTypeList.get();
-        Pointer<IntValuedEnum<cec_device_type>> pDeviceTypes = deviceTypeList.types();
+        Pointer<ValuedEnum<org.bridj.StructTest.cec_device_type>> pDeviceTypes = deviceTypeList.types();
     }
     
     public static class SBytes100 extends StructObject {

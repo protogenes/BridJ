@@ -76,7 +76,6 @@ import org.bridj.BridJ;
 import org.bridj.CRuntime;
 import org.bridj.Callback;
 import org.bridj.FlagSet;
-import org.bridj.IntValuedEnum;
 import org.bridj.NativeLibrary;
 import org.bridj.Platform;
 import org.bridj.Pointer;
@@ -95,7 +94,7 @@ public class TestCPP {
 //		//"F:\\Experiments\\tmp\\key\\svn\\nativelibs4java\\Runtime\\BridJ\\src\\test\\resources\\win32\\test.dll" +
 //        "C:\\Users\\Olivier\\Prog\\nativelibs4java\\Runtime\\BridJ\\src\\main\\cpp\\buildsys\\vs2008\\x64\\Debug\\test.dll"
 //	;
-	public enum Toto implements IntValuedEnum<Toto > {
+	public enum Toto implements ValuedEnum<Toto > {
 		IBV_SYSFS_NAME_MAX(64),
 		IBV_SYSFS_PATH_MAX(256);
 		Toto(int value) {

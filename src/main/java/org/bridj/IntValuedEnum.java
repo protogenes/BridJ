@@ -37,5 +37,6 @@ package org.bridj;
  *
  * @param <E> type of the enum
  */
+@Deprecated
 public interface IntValuedEnum<E extends Enum<E>> extends ValuedEnum<E> {
 }

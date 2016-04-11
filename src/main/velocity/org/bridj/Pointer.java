@@ -520,11 +520,11 @@ public abstract class Pointer<T> implements Comparable<Pointer<?>>, Iterable<T>
 		return org.bridj.util.DefaultParameterizedType.paramType(Pointer.class, targetType);	
 	}
 	/**
-	 * Create a {@code IntValuedEnum<T>} type. <br>
-	 * For Instance, {@code Pointer.intEnumType(SomeEnum.class) } returns a type that represents {@code IntValuedEnum<SomeEnum> }  
+	 * Create a {@code ValuedEnum<T>} type. <br>
+	 * For Instance, {@code Pointer.intEnumType(SomeEnum.class) } returns a type that represents {@code ValuedEnum<SomeEnum> }
 	 */
-	public static <E extends Enum<E>> Type intEnumType(Class<? extends IntValuedEnum<E>> targetType) {
-		return org.bridj.util.DefaultParameterizedType.paramType(IntValuedEnum.class, targetType);	
+	public static <E extends Enum<E>> Type enumType(Class<? extends ValuedEnum<E>> targetType) {
+		return org.bridj.util.DefaultParameterizedType.paramType(ValuedEnum.class, targetType);
 	}
 	
 	/**
@@ -1012,7 +1012,7 @@ public abstract class Pointer<T> implements Comparable<Pointer<?>>, Iterable<T>
     /**
      * Get a pointer to an enum. 
      */
-    public static <E extends Enum<E>> Pointer<IntValuedEnum<E>> pointerToEnum(IntValuedEnum<E> instance) {
+    public static <E extends Enum<E>> Pointer<ValuedEnum<E>> pointerToEnum(ValuedEnum<E> instance) {
     	Class<E> enumClass;
     	if (instance instanceof FlagSet) {
     		enumClass = ((FlagSet)instance).getEnumClass();
@@ -1021,8 +1021,8 @@ public abstract class Pointer<T> implements Comparable<Pointer<?>>, Iterable<T>
         } else 
         	throw new RuntimeException("Expected a FlagSet or an Enum, got " + instance);
 
-    	PointerIO<IntValuedEnum<E>> io = (PointerIO)PointerIO.getInstance(DefaultParameterizedType.paramType(IntValuedEnum.class, enumClass));
-    	Pointer<IntValuedEnum<E>> p = allocate(io);
+    	PointerIO<ValuedEnum<E>> io = (PointerIO)PointerIO.getInstance(DefaultParameterizedType.paramType(ValuedEnum.class, enumClass));
+    	Pointer<ValuedEnum<E>> p = allocate(io);
     	p.setInt((int)instance.value());
     	return p;
     }

@@ -197,23 +197,35 @@ class CommonPointerIOs {
 			//pointer.setPointer(index * Pointer.SIZE, Pointer.getPointer(value, callbackClass));
 		}
 	}
-	
-	static class IntValuedEnumPointerIO<E extends Enum<E> & ValuedEnum<E>> extends PointerIO<IntValuedEnum<E>> {
+
+	static class ValuedEnumPointerIO<E extends Enum<E> & ValuedEnum<E>> extends PointerIO<ValuedEnum<E>> {
 		final Class<E> enumClass;
 
-		public IntValuedEnumPointerIO(Class<E> enumClass) {
-			super(IntValuedEnum.class, 4, null);
+		public ValuedEnumPointerIO(Class<E> enumClass) {
+			super(ValuedEnum.class, (int)BridJ.sizeOf(enumClass), null);
 			this.enumClass = enumClass;
-		}
-		
-		@Override
-		public IntValuedEnum<E> get(Pointer<IntValuedEnum<E>> pointer, long index) {
-			return FlagSet.fromValue(pointer.getIntAtOffset(4 * index), enumClass);
 		}
 
 		@Override
-		public void set(Pointer<IntValuedEnum<E>> pointer, long index, IntValuedEnum<E> value) {
-			pointer.setIntAtOffset(4 * index, (int)value.value());
+		public ValuedEnum<E> get(Pointer<ValuedEnum<E>> pointer, long index) {
+			if (getTargetSize() == 4)
+				return FlagSet.fromValue(pointer.getIntAtOffset(4 * index), enumClass);
+			if (getTargetSize() == 2)
+				return FlagSet.fromValue(pointer.getShortAtOffset(2 * index), enumClass);
+			if (getTargetSize() == 8)
+				return FlagSet.fromValue(pointer.getLongAtOffset(8 * index), enumClass);
+			return FlagSet.fromValue(pointer.getByteAtOffset(index), enumClass);
+		}
+
+		@Override
+		public void set(Pointer<ValuedEnum<E>> pointer, long index, ValuedEnum<E> value) {
+			if (getTargetSize() == 4)
+				pointer.setIntAtOffset(4 * index, (int)value.value());
+			if (getTargetSize() == 2)
+				pointer.setShortAtOffset(2 * index, (short)value.value());
+			if (getTargetSize() == 8)
+				pointer.setLongAtOffset(8 * index, (long)value.value());
+			pointer.setByteAtOffset(index, (byte)value.value());
 		}
 	}
 	

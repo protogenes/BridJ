@@ -30,23 +30,21 @@
  */
 package org.bridj;
 
-import static org.bridj.Pointer.pointerToEnum;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.bridj.ann.Library;
+import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.bridj.ann.Library;
-import org.junit.Test;
+import static org.bridj.Pointer.*;
+import static org.junit.Assert.*;
 
 @Library("test")
 public class ValuedEnumTest {
     static {
 		BridJ.register();
 	}
-	public enum MyEnum implements IntValuedEnum<MyEnum > {
+	public enum MyEnum implements ValuedEnum<MyEnum > {
 		One(0),
 		Two(1),
 		Three(2);
@@ -66,8 +64,8 @@ public class ValuedEnumTest {
 	};
 	public static native ValuedEnum<MyEnum > intToMyEnum(int value);
 	public static native int MyEnumToInt(ValuedEnum<MyEnum > value);
-	public static native int PMyEnumToInt(Pointer<IntValuedEnum<MyEnum>> value);
-	public static native Pointer<IntValuedEnum<MyEnum>> intToPMyEnum(int value);
+	public static native int PMyEnumToInt(Pointer<ValuedEnum<org.bridj.ValuedEnumTest.MyEnum>> value);
+	public static native Pointer<ValuedEnum<org.bridj.ValuedEnumTest.MyEnum>> intToPMyEnum(int value);
     
     private static final int nTests = 100000;
 
@@ -88,7 +86,7 @@ public class ValuedEnumTest {
         MyEnum expected = MyEnum.Two;
         int expectedInt = (int)expected.value();
         for (int i = 0; i < nTests; i++) {
-            Pointer<IntValuedEnum<MyEnum>> ret = intToPMyEnum(expectedInt);
+            Pointer<ValuedEnum<org.bridj.ValuedEnumTest.MyEnum>> ret = intToPMyEnum(expectedInt);
             if (expectedInt != ret.get().value())
                 assertEquals(expectedInt, ret.get().value());
         }
@@ -118,7 +116,7 @@ public class ValuedEnumTest {
     
     
     /// enum values
-    public enum Fruit implements IntValuedEnum<Fruit > {
+    public enum Fruit implements ValuedEnum<Fruit > {
 //        None(0),
         Apple(1),
         Pear(2),
@@ -134,7 +132,7 @@ public class ValuedEnumTest {
         public Iterator<Fruit > iterator() {
                 return Collections.singleton(this).iterator();
         }
-        public static IntValuedEnum<Fruit > fromValue(int value) {
+        public static ValuedEnum<org.bridj.ValuedEnumTest.Fruit> fromValue(int value) {
                 return FlagSet.fromValue(value, values());
         }
     };
@@ -151,7 +149,7 @@ public class ValuedEnumTest {
 
     @Test
     public final void testFruitToStringAndIterator() {
-        IntValuedEnum<Fruit> fruit = Fruit.fromValue(8);
+        ValuedEnum<org.bridj.ValuedEnumTest.Fruit> fruit = Fruit.fromValue(8);
         assertEquals("Banana", fruit.toString());
         assertEquals(8, fruit.value());
         
@@ -161,7 +159,7 @@ public class ValuedEnumTest {
         assertFalse(it.hasNext());
         assertEquals(Fruit.Banana, gotFruit);
         
-        Pointer<IntValuedEnum<Fruit>> pFruit = pointerToEnum(fruit);
+        Pointer<ValuedEnum<org.bridj.ValuedEnumTest.Fruit>> pFruit = pointerToEnum(fruit);
         assertEquals(Fruit.Banana, pFruit.get());
         pFruit.set(Fruit.Orange);
         assertEquals(Fruit.Orange, pFruit.get());

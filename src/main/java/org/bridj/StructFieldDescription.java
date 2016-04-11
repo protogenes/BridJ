@@ -30,30 +30,18 @@
  */
 package org.bridj;
 
-import static org.bridj.StructUtils.alignmentOf;
-import static org.bridj.StructUtils.primTypeAlignment;
-import static org.bridj.StructUtils.primTypeLength;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.bridj.cpp.CPPObject;
 import org.bridj.cpp.CPPType;
 import org.bridj.util.DefaultParameterizedType;
 import org.bridj.util.Utils;
+
+import java.lang.reflect.*;
+import java.nio.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.bridj.StructUtils.*;
 
 /**
  * Internal metadata on a struct field
@@ -164,8 +152,8 @@ public class StructFieldDescription {
             } else if (ValuedEnum.class.isAssignableFrom(field.valueClass)) {
                 field.desc.nativeTypeOrPointerTargetType = resolveType((field.desc.valueType instanceof ParameterizedType) ? PointerIO.getClass(((ParameterizedType) field.desc.valueType).getActualTypeArguments()[0]) : null, structType);
                 Class<?> c = PointerIO.getClass(field.desc.nativeTypeOrPointerTargetType);
-                if (IntValuedEnum.class.isAssignableFrom(c)) {
-                    field.desc.byteLength = 4;
+                if (ValuedEnum.class.isAssignableFrom(c)) {
+                    field.desc.byteLength = BridJ.sizeOf(c);
                 } else {
                     throw new RuntimeException("Enum type unknown : " + c);
                 }

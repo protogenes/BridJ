@@ -30,21 +30,16 @@
  */
 package org.bridj.cpp.com;
 
-import java.util.Collections;
-import java.util.Iterator;
-
-import org.bridj.BridJ;
-import org.bridj.FlagSet;
-import org.bridj.IntValuedEnum;
-import org.bridj.Pointer;
-import org.bridj.StructObject;
-import org.bridj.ValuedEnum;
+import org.bridj.*;
 import org.bridj.ann.CLong;
 import org.bridj.ann.Field;
 import org.bridj.ann.Library;
 import org.bridj.ann.Runtime;
 import org.bridj.cpp.CPPObject;
 import org.bridj.cpp.CPPRuntime;
+
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Wrapper for library <b>oleaut32</b><br>
@@ -115,7 +110,7 @@ public class OLEAutomationLibrary {
 //		}
     };
 
-    public enum SYSKIND implements IntValuedEnum<SYSKIND> {
+    public enum SYSKIND implements ValuedEnum<SYSKIND> {
 
         SYS_WIN16(0),
         SYS_WIN32(1),
@@ -139,7 +134,7 @@ public class OLEAutomationLibrary {
         }
     };
 
-    public enum CALLCONV implements IntValuedEnum<CALLCONV> {
+    public enum CALLCONV implements ValuedEnum<CALLCONV> {
 
         CC_FASTCALL(0),
         CC_CDECL(1),
@@ -171,7 +166,7 @@ public class OLEAutomationLibrary {
         }
     };
 
-    public enum REGKIND implements IntValuedEnum<REGKIND> {
+    public enum REGKIND implements ValuedEnum<REGKIND> {
 
         REGKIND_DEFAULT(0),
         REGKIND_REGISTER(1),

@@ -30,14 +30,13 @@
  */
 package org.bridj.cpp.com;
 
+import org.bridj.FlagSet;
+import org.bridj.ValuedEnum;
+
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.bridj.FlagSet;
-import org.bridj.IntValuedEnum;
-import org.bridj.ValuedEnum;
-
-public enum VARENUM implements IntValuedEnum<VARENUM> {
+public enum VARENUM implements ValuedEnum<VARENUM> {
 
     VT_EMPTY(0),
     VT_NULL(1),

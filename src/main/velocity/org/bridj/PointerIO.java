@@ -161,11 +161,11 @@ public abstract class PointerIO<T> {
 					io = new CommonPointerIOs.CallbackPointerIO(cl);
 				else if (NativeObject.class.isAssignableFrom(cl))
 					io = new CommonPointerIOs.NativeObjectPointerIO(type);
-				else if (IntValuedEnum.class.isAssignableFrom(cl)) {
+				else if (ValuedEnum.class.isAssignableFrom(cl)) {
 					if (type instanceof ParameterizedType) {
 						Type enumType = ((ParameterizedType)type).getActualTypeArguments()[0];
 						if (enumType instanceof Class)
-							io = new CommonPointerIOs.IntValuedEnumPointerIO((Class)enumType);
+							io = new CommonPointerIOs.ValuedEnumPointerIO((Class)enumType);
 					}
 				}
 				else if (TypedPointer.class.isAssignableFrom(cl))

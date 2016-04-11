@@ -30,28 +30,6 @@
  */
 package org.bridj;
 
-import static org.bridj.BridJ.debug;
-import static org.bridj.BridJ.error;
-import static org.bridj.BridJ.info;
-import static org.bridj.BridJ.verbose;
-import static org.bridj.util.AnnotationUtils.getInheritableAnnotation;
-import static org.bridj.util.AnnotationUtils.isAnnotationPresent;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.bridj.NativeEntities.Builder;
 import org.bridj.ann.Convention;
 import org.bridj.ann.JNIBound;
@@ -59,6 +37,15 @@ import org.bridj.ann.Optional;
 import org.bridj.demangling.Demangler.Symbol;
 import org.bridj.util.ConcurrentCache;
 import org.bridj.util.Utils;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.bridj.BridJ.*;
+import static org.bridj.util.AnnotationUtils.*;
 
 /**
  * C runtime (used by default when no {@link org.bridj.ann.Runtime} annotation
@@ -711,10 +698,10 @@ public class CRuntime extends AbstractBridJRuntime {
     }
     private static boolean sameBindings(Class<?> t1, Class<?> t2) {
         return t1.equals(t2) ||
-            t1 == long.class && Pointer.class.isAssignableFrom(t2) ||
-            t2 == long.class && Pointer.class.isAssignableFrom(t1) ||
-            t1 == int.class && IntValuedEnum.class.isAssignableFrom(t2) ||
-            t2 == int.class && IntValuedEnum.class.isAssignableFrom(t1);
+                t1 == long.class && Pointer.class.isAssignableFrom(t2) ||
+                t2 == long.class && Pointer.class.isAssignableFrom(t1) ||
+                t1.isPrimitive() && ValuedEnum.class.isAssignableFrom(t2) && BridJ.sizeOf(t1) == BridJ.sizeOf(t2) ||
+                t2.isPrimitive() && ValuedEnum.class.isAssignableFrom(t1) && BridJ.sizeOf(t1) == BridJ.sizeOf(t2);
     }
     
     @SuppressWarnings("unchecked")

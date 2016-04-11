@@ -30,18 +30,18 @@
  */
 package org.bridj;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-//import com.sun.jna.Native;
-import java.util.Collections;
-import java.util.Iterator;
-
 import org.bridj.ann.Library;
 import org.bridj.ann.Name;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Collections;
+import java.util.Iterator;
+
+import static org.junit.Assert.*;
+
+//import com.sun.jna.Native;
 
 /**
  *
@@ -69,7 +69,7 @@ public class FunctionTest {
     @Name("testAddDyncall")
     public native int fooBar(int a, int b);
     
-    public enum ETest implements IntValuedEnum<ETest> {
+    public enum ETest implements ValuedEnum<ETest> {
     	eFirst(0),
     	eSecond(1),
     	eThird(2);
@@ -90,7 +90,7 @@ public class FunctionTest {
     }
     public static native ValuedEnum<ETest> testEnum(ValuedEnum<ETest> e);
     @Name("testEnum")
-    public static native IntValuedEnum<ETest> testIntEnum(IntValuedEnum<ETest> e);
+    public static native ValuedEnum<org.bridj.FunctionTest.ETest> testIntEnum(ValuedEnum<org.bridj.FunctionTest.ETest> e);
     
     @Test
     public void add() {

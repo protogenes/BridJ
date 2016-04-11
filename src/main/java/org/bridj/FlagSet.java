@@ -125,17 +125,6 @@ public class FlagSet<E extends Enum<E> & ValuedEnum<E>> implements ValuedEnum<E>
         return new FlagSet<EE>(value, enumClass, null);
     }
 
-    public static class IntFlagSet<E extends Enum<E> & ValuedEnum<E>> extends FlagSet<E> implements IntValuedEnum<E> {
-
-        protected IntFlagSet(long value, Class<E> enumClass, E[] enumClassValues) {
-            super(value, enumClass, enumClassValues);
-        }
-    }
-
-    public static <EE extends Enum<EE> & ValuedEnum<EE>> IntFlagSet<EE> createFlagSet(int value, Class<EE> enumClass) {
-        return new IntFlagSet<EE>(value, enumClass, null);
-    }
-
     @SuppressWarnings("unchecked")
     public static <EE extends Enum<EE> & ValuedEnum<EE>> FlagSet<EE> fromValue(ValuedEnum<EE> value) {
         if (value instanceof Enum) {
@@ -151,22 +140,18 @@ public class FlagSet<E extends Enum<E> & ValuedEnum<E>> implements ValuedEnum<E>
         }
         @SuppressWarnings("unchecked")
         Class<EE> enumClass = (Class<EE>)enumValue[0].getClass();
-        if (IntValuedEnum.class.isAssignableFrom(enumClass)) {
-            return new IntFlagSet<EE>(value, enumClass, enumValue);
-        } else {
-            return new FlagSet<EE>(value, enumClass, enumValue);
-        }
+        return new FlagSet<EE>(value, enumClass, enumValue);
     }
 //    public static <EE extends Enum<EE>> IntFlagSet<EE> createFlagSet(int value, EE... enumValue) {
 //        return (IntFlagSet<EE>)createFlagSet((long)value, enumValue);
 //    }
 
-    public static <EE extends Enum<EE> & ValuedEnum<EE>> IntValuedEnum<EE> fromValue(int value, Class<EE> enumClass) {
-        return (IntValuedEnum<EE>) fromValue((long) value, enumClass, enumClass.getEnumConstants());
+    public static <EE extends Enum<EE> & ValuedEnum<EE>> ValuedEnum<EE> fromValue(int value, Class<EE> enumClass) {
+        return fromValue((long) value, enumClass, enumClass.getEnumConstants());
     }
 
-    public static <EE extends Enum<EE> & ValuedEnum<EE>> IntValuedEnum<EE> fromValue(int value, EE... enumValues) {
-        return (IntValuedEnum<EE>) fromValue((long) value, enumValues);
+    public static <EE extends Enum<EE> & ValuedEnum<EE>> ValuedEnum<EE> fromValue(int value, EE... enumValues) {
+        return fromValue((long) value, enumValues);
     }
 
     public static <EE extends Enum<EE> & ValuedEnum<EE>> ValuedEnum<EE> fromValue(long value, EE... enumValues) {
@@ -184,11 +169,7 @@ public class FlagSet<E extends Enum<E> & ValuedEnum<E>> implements ValuedEnum<E>
         if (enums.size() == 1) {
             return (ValuedEnum<EE>) enums.get(0);
         }
-        if (IntValuedEnum.class.isAssignableFrom(enumClass)) {
-            return new IntFlagSet<EE>(value, enumClass, enums.toArray((EE[]) Array.newInstance(enumClass, enums.size())));
-        } else {
-            return new FlagSet<EE>(value, enumClass, enums.toArray((EE[]) Array.newInstance(enumClass, enums.size())));
-        }
+        return new FlagSet<EE>(value, enumClass, enums.toArray((EE[]) Array.newInstance(enumClass, enums.size())));
     }
 
     /**
