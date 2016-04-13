@@ -46,14 +46,6 @@ public class IUnknown extends CPPObject {
 
     protected boolean autoRelease;
 
-    public static IUnknown wrap(Object object) {
-        if (object instanceof IUnknown) {
-            return (IUnknown) object;
-        }
-
-        return new COMCallableWrapper(object);
-    }
-
     @Override
     protected void finalize() throws Throwable {
         if (autoRelease) {
@@ -62,14 +54,15 @@ public class IUnknown extends CPPObject {
         super.finalize();
     }
 
+//    @DispId(0x60000000)
     @Virtual(0)
     @Deprecated
     public native int QueryInterface(
             Pointer<GUID> riid,
-            Pointer<Pointer<IUnknown>> ppvObject);
+            Pointer<Pointer<Void>> ppvObject);
 
     public <I extends IUnknown> I QueryInterface(Class<I> type) {
-        Pointer<Pointer<IUnknown>> p = Pointer.allocatePointer(IUnknown.class);
+        Pointer<Pointer<Void>> p = Pointer.allocatePointer(Void.class);
         int ret = QueryInterface(getIID(type), p);
         if (ret != S_OK) {
             return null;
@@ -78,9 +71,11 @@ public class IUnknown extends CPPObject {
         return p.get().getNativeObject(type);
     }
 
+//    @DispId(0x60000001)
     @Virtual(1)
     public native int AddRef();
 
+//    @DispId(0x60000002)
     @Virtual(2)
     public native int Release();
 }

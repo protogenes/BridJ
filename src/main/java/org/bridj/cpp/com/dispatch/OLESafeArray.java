@@ -1,6 +1,5 @@
 package org.bridj.cpp.com.dispatch;
 
-import org.bridj.CLong;
 import org.bridj.Pointer;
 import org.bridj.cpp.com.COMStatus;
 import org.bridj.cpp.com.OLEAutomationLibrary;
@@ -11,9 +10,9 @@ import java.util.AbstractList;
 public class OLESafeArray<T> extends AbstractList<T> {
 	private final Class<T>           elementType;
 	private       Pointer<SAFEARRAY> safeArray;
-	private final long[]             lowerBounds;
-	private final long[]             upperBounds;
-	private final long[]             indices;
+	private final int[]              lowerBounds;
+	private final int[]              upperBounds;
+	private final int[]              indices;
 
 	public static <T> OLESafeArray<T> wrap1(Class<T> elementType, Pointer<SAFEARRAY> safeArray) {
 		return (OLESafeArray<T>) wrap(elementType, safeArray, 1);
@@ -33,21 +32,21 @@ public class OLESafeArray<T> extends AbstractList<T> {
 			throw new IllegalArgumentException("Dimension of SAFEARRAY does not match. Expected=" + expectedDimension + " Actual=" + actualDimension);
 		}
 
-		long[] lowerBounds = new long[actualDimension];
-		long[] upperBounds = new long[actualDimension];
-		Pointer<CLong> bound = Pointer.allocate(CLong.class);
+		int[] lowerBounds = new int[actualDimension];
+		int[] upperBounds = new int[actualDimension];
+		Pointer<Integer> bound = Pointer.allocateInt();
 
 		for (int i = 0; i < actualDimension; ++i) {
 			COMStatus.check(OLEAutomationLibrary.SafeArrayGetLBound(safeArray, i + 1, bound));
-			lowerBounds[i] = bound.getCLong();
+			lowerBounds[i] = bound.getInt();
 			COMStatus.check(OLEAutomationLibrary.SafeArrayGetUBound(safeArray, i + 1, bound));
-			upperBounds[i] = bound.getCLong();
+			upperBounds[i] = bound.getInt();
 		}
 
-		return new OLESafeArray<T>(elementType, safeArray, lowerBounds, upperBounds, new long[0]);
+		return new OLESafeArray<T>(elementType, safeArray, lowerBounds, upperBounds, new int[0]);
 	}
 
-	private OLESafeArray(Class<T> elementType, Pointer<SAFEARRAY> safeArray, long[] lowerBounds, long[] upperBounds, long[] indices) {
+	private OLESafeArray(Class<T> elementType, Pointer<SAFEARRAY> safeArray, int[] lowerBounds, int[] upperBounds, int[] indices) {
 		this.elementType = elementType;
 		this.safeArray = safeArray;
 		this.lowerBounds = lowerBounds;
@@ -68,23 +67,23 @@ public class OLESafeArray<T> extends AbstractList<T> {
 
 		if (indices.length + 1 == lowerBounds.length) {
 			Pointer<T> element = Pointer.allocate(elementType);
-			Pointer<CLong> clongs = Pointer.allocateCLongs(lowerBounds.length);
+			Pointer<Integer> idx = Pointer.allocateInts(lowerBounds.length);
 			for (int i = 0; i < indices.length; i++) {
-				clongs.set(i, CLong.valueOf(indices[indices.length - 1 - i]));
+				idx.set(i, indices[indices.length - 1 - i]);
 			}
-			clongs.set(indices.length, CLong.valueOf(index));
-			COMStatus.check(OLEAutomationLibrary.SafeArrayGetElement(safeArray, clongs, element));
+			idx.set(indices.length, index);
+			COMStatus.check(OLEAutomationLibrary.SafeArrayGetElement(safeArray, idx, element));
 			return element.get();
 		}
 
-		long[] longs = new long[indices.length + 1];
-		System.arraycopy(indices, 0, longs, 0, indices.length);
-		longs[indices.length] = index;
-		return (T) new OLESafeArray<T>(elementType, safeArray, lowerBounds, upperBounds, longs);
+		int[] idx = new int[indices.length + 1];
+		System.arraycopy(indices, 0, idx, 0, indices.length);
+		idx[indices.length] = index;
+		return (T) new OLESafeArray<T>(elementType, safeArray, lowerBounds, upperBounds, idx);
 	}
 
 	@Override
 	public int size() {
-		return (int) upperBounds[indices.length] + 1;
+		return upperBounds[indices.length] + 1;
 	}
 }

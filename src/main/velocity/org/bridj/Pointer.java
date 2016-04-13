@@ -3197,9 +3197,10 @@ public abstract class Pointer<T> implements Comparable<Pointer<?>>, Iterable<T>
 
 #defPointerToString("C" "Byte")
 #defPointerToString("WideC" "Character")
+#defPointerToString("BSTR" "Character")
 
 	
-#foreach ($string in ["C", "WideC"])
+#foreach ($string in ["C", "WideC", "BSTR"])
 //-- StringType: $string --
 
 	/**

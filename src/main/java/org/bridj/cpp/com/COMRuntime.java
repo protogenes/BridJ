@@ -38,17 +38,19 @@ import org.bridj.ann.Ptr;
 import org.bridj.ann.Runtime;
 import org.bridj.cpp.CPPObject;
 import org.bridj.cpp.CPPRuntime;
+import org.bridj.cpp.com.VARIANT.VARIANT_BOOL;
 import org.bridj.cpp.com.VARIANT.__VARIANT_NAME_1_union;
 import org.bridj.cpp.com.VARIANT.__VARIANT_NAME_1_union.__tagVARIANT;
 import org.bridj.cpp.com.VARIANT.__VARIANT_NAME_1_union.__tagVARIANT.__VARIANT_NAME_3_union;
-import org.bridj.cpp.com.dispatch.CONNECTDATA;
-import org.bridj.cpp.com.dispatch.IConnectionPoint;
-import org.bridj.cpp.com.dispatch.IConnectionPointContainer;
-import org.bridj.cpp.com.dispatch.IEnumConnections;
+import org.bridj.cpp.com.dispatch.*;
+import org.bridj.util.AnnotationUtils;
 import org.bridj.util.Utils;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.bridj.Pointer.*;
 import static org.bridj.cpp.com.COMStatus.*;
@@ -294,14 +296,13 @@ public class COMRuntime extends CPPRuntime {
     static ValuedEnum<VARENUM> getType(VARIANT v) {
         __VARIANT_NAME_1_union v1 = v.__VARIANT_NAME_1();
         __tagVARIANT v2 = v1.__VARIANT_NAME_2();
-        short vt = v2.vt();
-        return FlagSet.fromValue(vt, VARENUM.class);
+        return v2.vt();
     }
 
     static VARIANT setType(VARIANT v, ValuedEnum<VARENUM> vt) {
         __VARIANT_NAME_1_union v1 = v.__VARIANT_NAME_1();
         __tagVARIANT v2 = v1.__VARIANT_NAME_2();
-        v2.vt((short) vt.value());
+        v2.vt(vt);
         return v;
     }
 
@@ -352,7 +353,7 @@ public class COMRuntime extends CPPRuntime {
                     return values.pllVal();
                 /* BOOL          */
                 case VT_BOOL:
-                    return values.pbVal().as(Boolean.class);
+                    return values.pboolVal();
 
                 case VT_BSTR:
                     return values.pbstrVal();
@@ -384,7 +385,7 @@ public class COMRuntime extends CPPRuntime {
                 return values.ullVal();
             /* BOOL          */
             case VT_BOOL:
-                return values.bVal() != 0;
+                return values.boolVal();
             case VT_R4:
                 return values.fltVal();
             case VT_R8:
@@ -415,7 +416,7 @@ public class COMRuntime extends CPPRuntime {
             values.lVal((Integer) value);
         } else if (value instanceof Long) {
             change(v, VT_I8);
-            values.llval((Long) value);
+            values.llVal((Long) value);
         } else if (value instanceof Short) {
             change(v, VT_I2);
             values.iVal((Short) value);
@@ -429,8 +430,11 @@ public class COMRuntime extends CPPRuntime {
             change(v, VT_I8);
             values.dblVal((Double) value);
         } else if (value instanceof Character) {
-            change(v, VT_I2);
-            values.iVal((short) ((Character) value).charValue());
+	        change(v, VT_I2);
+	        values.iVal((short) ((Character) value).charValue());
+        } else if (value instanceof Boolean) {
+	        change(v, VT_BOOL);
+	        values.bool(((Boolean) value) ? VARIANT_BOOL.TRUE : VARIANT_BOOL.FALSE);
         } else if (value instanceof String) {
             change(v, VT_BSTR);
             /*String str = (String)value;

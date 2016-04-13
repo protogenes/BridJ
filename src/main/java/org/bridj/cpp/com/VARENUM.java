@@ -32,10 +32,12 @@ package org.bridj.cpp.com;
 
 import org.bridj.FlagSet;
 import org.bridj.ValuedEnum;
+import org.bridj.ann.Struct;
 
 import java.util.Collections;
 import java.util.Iterator;
 
+@Struct(size = 2)
 public enum VARENUM implements ValuedEnum<VARENUM> {
 
     VT_EMPTY(0),
@@ -69,6 +71,9 @@ public enum VARENUM implements ValuedEnum<VARENUM> {
     VT_USERDEFINED(29),
     VT_LPSTR(30),
     VT_LPWSTR(31),
+    VT_RECORD(36),
+    VT_INT_PTR(37),
+    VT_UINT_PTR(38),
     VT_FILETIME(64),
     VT_BLOB(65),
     VT_STREAM(66),
@@ -78,6 +83,7 @@ public enum VARENUM implements ValuedEnum<VARENUM> {
     VT_BLOB_OBJECT(70),
     VT_CF(71),
     VT_CLSID(72),
+    VT_VERSIONED_STREAM(73),
     VT_VECTOR(0x1000),
     VT_ARRAY(0x2000),
     VT_BYREF(0x4000),

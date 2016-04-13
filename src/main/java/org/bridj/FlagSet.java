@@ -146,14 +146,6 @@ public class FlagSet<E extends Enum<E> & ValuedEnum<E>> implements ValuedEnum<E>
 //        return (IntFlagSet<EE>)createFlagSet((long)value, enumValue);
 //    }
 
-    public static <EE extends Enum<EE> & ValuedEnum<EE>> ValuedEnum<EE> fromValue(int value, Class<EE> enumClass) {
-        return fromValue((long) value, enumClass, enumClass.getEnumConstants());
-    }
-
-    public static <EE extends Enum<EE> & ValuedEnum<EE>> ValuedEnum<EE> fromValue(int value, EE... enumValues) {
-        return fromValue((long) value, enumValues);
-    }
-
     public static <EE extends Enum<EE> & ValuedEnum<EE>> ValuedEnum<EE> fromValue(long value, EE... enumValues) {
         if (enumValues == null || enumValues.length == 0) {
             throw new IllegalArgumentException("Expected at least one enum value");

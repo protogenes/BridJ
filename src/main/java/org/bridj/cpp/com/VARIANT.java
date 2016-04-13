@@ -32,16 +32,40 @@ package org.bridj.cpp.com;
 
 import org.bridj.Pointer;
 import org.bridj.StructObject;
-import org.bridj.ann.CLong;
+import org.bridj.ValuedEnum;
 import org.bridj.ann.Field;
 import org.bridj.ann.Runtime;
+import org.bridj.ann.Struct;
 import org.bridj.ann.Union;
+import org.bridj.cpp.com.OLEAutomationLibrary.DATE;
+
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Represents an object that can be interpreted as more than one type.
  */
 @Runtime(COMRuntime.class)
 public class VARIANT extends StructObject {
+
+    @Struct(size = 2)
+    public static enum VARIANT_BOOL implements ValuedEnum<VARIANT_BOOL> {
+        FALSE((short) 0),
+        TRUE((short) -1);
+        private final short value;
+
+        VARIANT_BOOL(short value) {
+            this.value = value;
+        }
+
+        public long value() {
+            return value;
+        }
+
+        public Iterator<VARIANT_BOOL> iterator() {
+            return Collections.singleton(this).iterator();
+        }
+    }
 
     public VARIANT(Object value) {
         super();
@@ -97,19 +121,19 @@ public class VARIANT extends StructObject {
             /// C type : VARTYPE
 
             @Field(0)
-            public short vt() {
-                return this.io.getShortField(this, 0);
+            public ValuedEnum<VARENUM> vt() {
+                return this.io.getEnumField(this, 0);
             }
             /// C type : VARTYPE
 
             @Field(0)
-            public __tagVARIANT vt(short vt) {
-                this.io.setShortField(this, 0, vt);
+            public __tagVARIANT vt(ValuedEnum<VARENUM> vt) {
+                this.io.setEnumField(this, 0, vt);
                 return this;
             }
             /// C type : VARTYPE
 
-            public final short vt_$eq(short vt) {
+            public final ValuedEnum<VARENUM> vt_$eq(ValuedEnum<VARENUM> vt) {
                 vt(vt);
                 return vt;
             }
@@ -181,38 +205,36 @@ public class VARIANT extends StructObject {
                 /// VT_I8
 
                 @Field(0)
-                public long llval() {
+                public long llVal() {
                     return this.io.getLongField(this, 0);
                 }
                 /// VT_I8
 
                 @Field(0)
-                public __VARIANT_NAME_3_union llval(long llval) {
+                public __VARIANT_NAME_3_union llVal(long llval) {
                     this.io.setLongField(this, 0, llval);
                     return this;
                 }
 
-                public final long llval_$eq(long llval) {
-                    llval(llval);
+                public final long llVal_$eq(long llval) {
+                    llVal(llval);
                     return llval;
                 }
                 /// VT_I4
 
-                @CLong
                 @Field(1)
-                public long lVal() {
-                    return this.io.getCLongField(this, 1);
+                public int lVal() {
+                    return this.io.getIntField(this, 1);
                 }
                 /// VT_I4
 
-                @CLong
                 @Field(1)
-                public __VARIANT_NAME_3_union lVal(long lVal) {
-                    this.io.setCLongField(this, 1, lVal);
+                public __VARIANT_NAME_3_union lVal(int lVal) {
+                    this.io.setIntField(this, 1, lVal);
                     return this;
                 }
 
-                public final long lVal_$eq(long lVal) {
+                public final int lVal_$eq(int lVal) {
                     lVal(lVal);
                     return lVal;
                 }
@@ -315,8 +337,8 @@ public class VARIANT extends StructObject {
                  * C type : VARIANT_BOOL
                  */
                 @Field(6)
-                public int boolVal() {
-                    return this.io.getIntField(this, 6);
+                public ValuedEnum<VARIANT_BOOL> boolVal() {
+                    return this.io.getEnumField(this, 6);
                 }
 
                 /**
@@ -324,32 +346,32 @@ public class VARIANT extends StructObject {
                  * C type : VARIANT_BOOL
                  */
                 @Field(6)
-                public __VARIANT_NAME_3_union boolVal(int boolVal) {
-                    this.io.setIntField(this, 6, boolVal);
+                public __VARIANT_NAME_3_union boolVal(ValuedEnum<VARIANT_BOOL> boolVal) {
+                    this.io.setEnumField(this, 6, boolVal);
                     return this;
                 }
                 /// C type : VARIANT_BOOL
 
-                public final int boolVal_$eq(int boolVal) {
+                public final ValuedEnum<VARIANT_BOOL> boolVal_$eq(ValuedEnum<VARIANT_BOOL> boolVal) {
                     boolVal(boolVal);
                     return boolVal;
                 }
                 /// C type : _VARIANT_BOOL
 
                 @Field(7)
-                public int bool() {
-                    return this.io.getIntField(this, 7);
+                public ValuedEnum<VARIANT_BOOL> bool() {
+                    return this.io.getEnumField(this, 7);
                 }
                 /// C type : _VARIANT_BOOL
 
                 @Field(7)
-                public __VARIANT_NAME_3_union bool(int bool) {
-                    this.io.setIntField(this, 7, bool);
+                public __VARIANT_NAME_3_union bool(ValuedEnum<VARIANT_BOOL> bool) {
+                    this.io.setEnumField(this, 7, bool);
                     return this;
                 }
                 /// C type : _VARIANT_BOOL
 
-                public final int bool_$eq(int bool) {
+                public final ValuedEnum<VARIANT_BOOL> bool_$eq(ValuedEnum<VARIANT_BOOL> bool) {
                     bool(bool);
                     return bool;
                 }
@@ -359,8 +381,8 @@ public class VARIANT extends StructObject {
                  * C type : SCODE
                  */
                 @Field(8)
-                public int scode() {
-                    return this.io.getIntField(this, 8);
+                public long scode() {
+                    return this.io.getLongField(this, 8);
                 }
 
                 /**
@@ -368,8 +390,8 @@ public class VARIANT extends StructObject {
                  * C type : SCODE
                  */
                 @Field(8)
-                public __VARIANT_NAME_3_union scode(int scode) {
-                    this.io.setIntField(this, 8, scode);
+                public __VARIANT_NAME_3_union scode(long scode) {
+                    this.io.setLongField(this, 8, scode);
                     return this;
                 }
                 /// C type : SCODE
@@ -393,8 +415,8 @@ public class VARIANT extends StructObject {
                  * C type : DATE
                  */
                 @Field(10)
-                public double date() {
-                    return this.io.getDoubleField(this, 10);
+                public DATE date() {
+                    return this.io.getNativeObjectField(this, 10);
                 }
 
                 /**
@@ -402,13 +424,13 @@ public class VARIANT extends StructObject {
                  * C type : DATE
                  */
                 @Field(10)
-                public __VARIANT_NAME_3_union date(double date) {
-                    this.io.setDoubleField(this, 10, date);
+                public __VARIANT_NAME_3_union date(DATE date) {
+                    this.io.setNativeObjectField(this, 10, date);
                     return this;
                 }
                 /// C type : DATE
 
-                public final double date_$eq(double date) {
+                public final DATE date_$eq(DATE date) {
                     date(date);
                     return date;
                 }
@@ -418,7 +440,7 @@ public class VARIANT extends StructObject {
                  * C type : BSTR
                  */
                 @Field(11)
-                public Pointer<Byte> bstrVal() {
+                public Pointer<Character> bstrVal() {
                     return this.io.getPointerField(this, 11);
                 }
 
@@ -427,13 +449,13 @@ public class VARIANT extends StructObject {
                  * C type : BSTR
                  */
                 @Field(11)
-                public __VARIANT_NAME_3_union bstrVal(Pointer<Byte> bstrVal) {
+                public __VARIANT_NAME_3_union bstrVal(Pointer<Character> bstrVal) {
                     this.io.setPointerField(this, 11, bstrVal);
                     return this;
                 }
                 /// C type : BSTR
 
-                public final Pointer<Byte> bstrVal_$eq(Pointer<Byte> bstrVal) {
+                public final Pointer<Character> bstrVal_$eq(Pointer<Character> bstrVal) {
                     bstrVal(bstrVal);
                     return bstrVal;
                 }
@@ -568,7 +590,7 @@ public class VARIANT extends StructObject {
                  * C type : LONG*
                  */
                 @Field(17)
-                public Pointer<CLong> plVal() {
+                public Pointer<Integer> plVal() {
                     return this.io.getPointerField(this, 17);
                 }
 
@@ -577,13 +599,13 @@ public class VARIANT extends StructObject {
                  * C type : LONG*
                  */
                 @Field(17)
-                public __VARIANT_NAME_3_union plVal(Pointer<CLong> plVal) {
+                public __VARIANT_NAME_3_union plVal(Pointer<Integer> plVal) {
                     this.io.setPointerField(this, 17, plVal);
                     return this;
                 }
                 /// C type : LONG*
 
-                public final Pointer<CLong> plVal_$eq(Pointer<CLong> plVal) {
+                public final Pointer<Integer> plVal_$eq(Pointer<Integer> plVal) {
                     plVal(plVal);
                     return plVal;
                 }
@@ -668,7 +690,7 @@ public class VARIANT extends StructObject {
                  * C type : VARIANT_BOOL*
                  */
                 @Field(21)
-                public Pointer<Integer> pboolVal() {
+                public Pointer<ValuedEnum<VARIANT_BOOL>> pboolVal() {
                     return this.io.getPointerField(this, 21);
                 }
 
@@ -677,13 +699,13 @@ public class VARIANT extends StructObject {
                  * C type : VARIANT_BOOL*
                  */
                 @Field(21)
-                public __VARIANT_NAME_3_union pboolVal(Pointer<Integer> pboolVal) {
+                public __VARIANT_NAME_3_union pboolVal(Pointer<ValuedEnum<VARIANT_BOOL>> pboolVal) {
                     this.io.setPointerField(this, 21, pboolVal);
                     return this;
                 }
                 /// C type : VARIANT_BOOL*
 
-                public final Pointer<Integer> pboolVal_$eq(Pointer<Integer> pboolVal) {
+                public final Pointer<ValuedEnum<VARIANT_BOOL>> pboolVal_$eq(Pointer<ValuedEnum<VARIANT_BOOL>> pboolVal) {
                     pboolVal(pboolVal);
                     return pboolVal;
                 }
@@ -1001,7 +1023,6 @@ public class VARIANT extends StructObject {
                     return this;
                 }
                 /// C type : ULONG
-
                 public final int ulVal_$eq(int ulVal) {
                     ulVal(ulVal);
                     return ulVal;

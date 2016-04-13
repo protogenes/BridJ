@@ -67,7 +67,7 @@ public class COMTest {
 	static class SomeUnknown extends IUnknown {
 		//public SomeUnknown() {}
 		@Override
-		public int QueryInterface(Pointer<GUID> riid, Pointer<Pointer<IUnknown>> ppvObject) {
+		public int QueryInterface(Pointer<GUID> riid, Pointer<Pointer<Void>> ppvObject) {
 			return 0;
 		}
 		int refs;

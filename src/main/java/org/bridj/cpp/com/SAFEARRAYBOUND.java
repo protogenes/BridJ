@@ -32,7 +32,6 @@ package org.bridj.cpp.com;
 
 import org.bridj.CRuntime;
 import org.bridj.StructObject;
-import org.bridj.ann.CLong;
 import org.bridj.ann.Field;
 import org.bridj.ann.Runtime;
 
@@ -68,20 +67,18 @@ public class SAFEARRAYBOUND extends StructObject {
         return cElements;
     }
 
-    @CLong
     @Field(1)
-    public long lLbound() {
-        return this.io.getCLongField(this, 1);
+    public int lLbound() {
+        return this.io.getIntField(this, 1);
     }
 
-    @CLong
     @Field(1)
-    public SAFEARRAYBOUND lLbound(long lLbound) {
-        this.io.setCLongField(this, 1, lLbound);
+    public SAFEARRAYBOUND lLbound(int lLbound) {
+        this.io.setIntField(this, 1, lLbound);
         return this;
     }
 
-    public final long lLbound_$eq(long lLbound) {
+    public final int lLbound_$eq(int lLbound) {
         lLbound(lLbound);
         return lLbound;
     }
