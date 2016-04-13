@@ -218,15 +218,37 @@ public class StructIO {
 		StructFieldDescription fd = desc.fields[fieldIndex];
 		struct.peer.offset(fd.byteOffset).setNativeObject(value, fd.nativeTypeOrPointerTargetType);
 	}
-	
+
 	public final <E extends Enum<E> & ValuedEnum<E>> ValuedEnum<E> getEnumField(StructObject struct, int fieldIndex) {
-        StructFieldDescription fd = desc.fields[fieldIndex];
-		return FlagSet.fromValue(struct.peer.getIntAtOffset(fd.byteOffset), (Class<E>)fd.nativeTypeOrPointerTargetType);
+		StructFieldDescription fd = desc.fields[fieldIndex];
+		switch ((int) fd.byteLength) {
+			case 8:
+				return FlagSet.fromValue(struct.peer.getLongAtOffset(fd.byteOffset), (Class<E>) fd.nativeTypeOrPointerTargetType);
+			case 4:
+				return FlagSet.fromValue(struct.peer.getIntAtOffset(fd.byteOffset), (Class<E>) fd.nativeTypeOrPointerTargetType);
+			case 2:
+				return FlagSet.fromValue(struct.peer.getShortAtOffset(fd.byteOffset), (Class<E>) fd.nativeTypeOrPointerTargetType);
+			default:
+				return FlagSet.fromValue(struct.peer.getByteAtOffset(fd.byteOffset), (Class<E>) fd.nativeTypeOrPointerTargetType);
+		}
 	}
 	
 	public final void setEnumField(StructObject struct, int fieldIndex, ValuedEnum<?> value) {
 		StructFieldDescription fd = desc.fields[fieldIndex];
-		struct.peer.setIntAtOffset(fd.byteOffset, (int)value.value());
+		switch ((int) fd.byteLength) {
+			case 8:
+				struct.peer.setLongAtOffset(fd.byteOffset, value.value());
+				break;
+			case 4:
+				struct.peer.setIntAtOffset(fd.byteOffset, (int)value.value());
+				break;
+			case 2:
+				struct.peer.setShortAtOffset(fd.byteOffset, (short)value.value());
+				break;
+			default:
+				struct.peer.setByteAtOffset(fd.byteOffset, (byte)value.value());
+				break;
+		}
 	}
 	
     private void setSignedIntegral(Pointer<?> ptr, long byteOffset, long byteLength, long bitMask, long bitOffset, long value) {
