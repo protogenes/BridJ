@@ -32,6 +32,7 @@ package org.bridj.util;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
 /**
  * Default implementation of {@link java.lang.reflect.ParameterizedType}
@@ -128,11 +129,11 @@ public class DefaultParameterizedType implements ParameterizedType {
     //@Override
 
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof DefaultParameterizedType)) {
+        if (o == null || !(o instanceof ParameterizedType)) {
             return false;
         }
 
-        DefaultParameterizedType t = (DefaultParameterizedType) o;
+        ParameterizedType t = (ParameterizedType) o;
         if (!eq(getRawType(), t.getRawType())) {
             return false;
         }
@@ -140,17 +141,6 @@ public class DefaultParameterizedType implements ParameterizedType {
             return false;
         }
 
-        Object[] tp = t.actualTypeArguments;
-        if (actualTypeArguments.length != tp.length) {
-            return false;
-        }
-
-        for (int i = 0, n = actualTypeArguments.length; i < n; i++) {
-            if (!eq(actualTypeArguments[i], tp[i])) {
-                return false;
-            }
-        }
-
-        return true;
+        return Arrays.equals(actualTypeArguments, t.getActualTypeArguments());
     }
 }
