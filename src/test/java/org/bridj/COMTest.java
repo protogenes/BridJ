@@ -50,6 +50,7 @@ public class COMTest {
 		if (!hasCOM)
             return;
         try {
+	        COMRuntime.initialize();
             IShellWindows win = COMRuntime.newInstance(IShellWindows.class);
             assertNotNull(win);
             IUnknown iu = win.QueryInterface(IUnknown.class);
@@ -57,7 +58,7 @@ public class COMTest {
             win = iu.QueryInterface(IShellWindows.class);
             assertNotNull(win);
             win.Release();
-            
+            COMRuntime.uninitialize();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(COMTest.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -95,9 +96,10 @@ public class COMTest {
     public void testICreateDevEnum() throws Exception {
     	if (!hasCOM) 
     		return;
-    	
+    	COMRuntime.initialize();
     	//Not needed, as it's called by COMRuntime.newInstance : COMRuntime.initialize(); 
     	ICreateDevEnum devEnumCreator = COMRuntime.newInstance(ICreateDevEnum.class);
+	    COMRuntime.uninitialize();
     }
     
     @Test

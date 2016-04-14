@@ -167,41 +167,66 @@ public class COMRuntime extends CPPRuntime {
 
         return parseGUID(id.value());
     }
-    static ThreadLocal<Object> comInitializer = new ThreadLocal<Object>() {
-        @Override
-        protected Object initialValue() {
-            COMStatus.check(CoInitializeEx(0, COINIT.COINIT_MULTITHREADED));
-            return new Object() {
-                @Override
-                protected void finalize() throws Throwable {
-                    CoUninitialize();
-                }
-            };
-        }
+
+    private static final ThreadLocal<Integer> COM_INITIALIZE = new ThreadLocal<Integer>() {
+	    @Override
+	    protected Integer initialValue() {
+		    return 0;
+	    }
     };
 
-    @Override
-    protected boolean isSymbolOptional(Method method) {
-        return true;
-    }
+	@Override
+	protected boolean isSymbolOptional(Method method) {
+		return true;
+	}
 
-    /**
-     * Initialize COM the current thread (uninitialization is done automatically
-     * upon thread death).<br>
-     * Calls CoInitialize with COINIT_MULTITHREADED max once per thread.<br>
-     * This is called automatically in {@link COMRuntime#newInstance(Class)}, so
-     * you'll typically never need to call this method by hand.
-     */
-    public static void initialize() {
-        comInitializer.get();
-    }
+	/**
+	 * Initialize COM in the current thread.<br>
+	 * Calls CoInitialize with COINIT_MULTITHREADED only once per thread.<br>
+	 */
+	public static void initialize() {
+		int i = COM_INITIALIZE.get();
+		if (i == 0) {
+			CoInitializeEx(0, COINIT.COINIT_MULTITHREADED);
+		}
+		COM_INITIALIZE.set(i + 1);
+	}
 
-    public static <I extends IUnknown> I newInstance(Class<I> type) throws ClassNotFoundException {
-        return newInstance(type, type);
-    }
+	public static void uninitialize() {
+		int i = COM_INITIALIZE.get() - 1;
+		if (i == 0) {
+			CoUninitialize();
+			COM_INITIALIZE.remove();
+		} else {
+			COM_INITIALIZE.set(i);
+		}
+	}
 
-    public static <T extends IUnknown, I extends IUnknown> I newInstance(Class<T> instanceClass, Class<I> instanceInterface) throws ClassNotFoundException {
-        initialize();
+	public void executeCOMActions(Runnable actions) {
+		initialize();
+		try {
+			actions.run();
+		} finally {
+			uninitialize();
+		}
+	}
+
+	public Runnable wrapCOMRunnable(final Runnable inner) {
+		return new Runnable() {
+			public void run() {
+				executeCOMActions(inner);
+			}
+		};
+	}
+
+	public static <I extends IUnknown> I newInstance(Class<I> type) throws ClassNotFoundException {
+		return newInstance(type, type);
+	}
+
+	public static <T extends IUnknown, I extends IUnknown> I newInstance(Class<T> instanceClass, Class<I> instanceInterface) throws ClassNotFoundException {
+		if (COM_INITIALIZE.get() == 0) {
+			throw new IllegalStateException("COM was not initialized in the current thread.");
+		}
 
         Pointer<Pointer<?>> p = Pointer.allocatePointer();
         Pointer<GUID> clsid = getCLSID(instanceClass), uuid = getIID(instanceInterface);
