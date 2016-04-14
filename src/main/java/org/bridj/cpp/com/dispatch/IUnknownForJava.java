@@ -28,54 +28,70 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.bridj.cpp.com;
+package org.bridj.cpp.com.dispatch;
 
+import org.bridj.BridJ;
 import org.bridj.Pointer;
+import org.bridj.cpp.com.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementing the IDispatch Interface :
  * http://msdn.microsoft.com/en-us/library/ms221037.aspx Simulating COM
  * Interfaces : http://msdn.microsoft.com/en-us/library/111chfb8.aspx
  */
-public class COMCallableWrapper extends IDispatch {
+public class IUnknownForJava extends IUnknown {
+	private final AtomicInteger         refCount   = new AtomicInteger(1);
+	private final Map<String, IUnknown> interfaces = new HashMap<String, IUnknown>();
 
-    Object instance;
+	public <T extends IUnknown & AggregatableIUnknown> IUnknownForJava(T... objects) {
+		for (AggregatableIUnknown object : objects) {
+			object.initOuterUnknown(this);
+			for (Class<?> cls = object.getClass(); cls != IUnknown.class; cls =  cls.getSuperclass()) {
+				IID iid = cls.getAnnotation(IID.class);
+				if (iid != null) {
+					Pointer<GUID> guid = COMRuntime.parseGUID(iid.value());
+					interfaces.put(guid.get().toString(), (IUnknown) object);
+				}
+			}
+		}
+		interfaces.put(COMRuntime.getIID(IUnknown.class).get().toString(), this);
+	}
 
-    public COMCallableWrapper(Object instance) {
-        this.instance = instance;
-    }
-//	public class IDispatchImpl extends IDispatch {
+	@Override
+	public int QueryInterface(Pointer<GUID> riid, Pointer<Pointer<Void>> ppvObject) {
+		if (ppvObject == null || riid == null) {
+			return COMStatus.E_POINTER;
+		}
+		ppvObject.set(null);
+		String guid = riid.get().toString();
+		IUnknown result = interfaces.get(guid);
+		if (result == null) {
+			return COMStatus.E_NOINTERFACE;
+		}
+		result.AddRef();
+		ppvObject.set(Pointer.getPointer(result).as(Void.class));
+		return COMStatus.S_OK;
+	}
 
-    @Override
-    public int GetIDsOfNames(Pointer riid,
-            Pointer<Pointer<Character>> rgszNames, int cNames,
-            int lcid, Pointer<Integer> rgDispId) {
+	@Override
+	public int AddRef() {
+		int c = refCount.getAndIncrement();
+		if (c == 1) {
+			BridJ.protectFromGC(this);
+		}
+		return c;
+	}
 
-        // TODO
-        return COMRuntime.E_NOTIMPL;
-    }
-
-    @Override
-    public int Invoke(int dispIdMember, Pointer<Byte> riid, int lcid,
-            short wFlags, Pointer<DISPPARAMS> pDispParams,
-            Pointer<VARIANT> pVarResult, Pointer<EXCEPINFO> pExcepInfo,
-            Pointer<Integer> puArgErr) {
-
-        // TODO
-        return COMRuntime.E_NOTIMPL;
-    }
-
-    @Override
-    public int GetTypeInfo(int iTInfo, int lcid,
-            Pointer<Pointer<ITypeInfo>> ppTInfo) {
-        // TODO
-        return COMRuntime.E_NOTIMPL;
-    }
-
-    @Override
-    public int GetTypeInfoCount(Pointer<Integer> pctinfo) {
-        // TODO
-        return COMRuntime.E_NOTIMPL;
-    }
-//	}
+	@Override
+	public int Release() {
+		int c = refCount.decrementAndGet();
+		if (c == 1) {
+			BridJ.unprotectFromGC(this);
+		}
+		return c;
+	}
 }

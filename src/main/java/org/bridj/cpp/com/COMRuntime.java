@@ -533,4 +533,68 @@ public class COMRuntime extends CPPRuntime {
         }
         return p;
     }
+
+
+	private final Map<Class<? extends IDispatch>, DispatchInfo> dispatchInfoCache = new ConcurrentHashMap<Class<? extends IDispatch>, DispatchInfo>();
+
+	public DispatchInfo getDispatchInfo(Class<? extends IDispatch> cls) {
+		DispatchInfo result = dispatchInfoCache.get(cls);
+		if (result == null) {
+			TLB tlb = AnnotationUtils.getInheritableAnnotation(TLB.class, cls);
+			Package pkg = cls.getPackage();
+			while (tlb == null && pkg != null) {
+				tlb = pkg.getAnnotation(TLB.class);
+				int idx = pkg.getName().lastIndexOf('.');
+				pkg = Package.getPackage(pkg.getName().substring(0, idx));
+			}
+			if (pkg == null) {
+				throw new IllegalArgumentException("Cannot find " + TLB.class.getSimpleName() + " annotation for " + cls);
+			}
+
+			Pointer<Pointer<ITypeLib>> ppTypeLib = Pointer.allocatePointer(ITypeLib.class);
+			if (tlb.fileName().length() == 0) {
+				COMStatus.check(OLEAutomationLibrary.LoadRegTypeLib(parseGUID(tlb.guid()), tlb.majorVersion(), tlb.minorVersion(), 0, ppTypeLib));
+			} else {
+				File nativeLibraryFile = BridJ.getNativeLibraryFile(tlb.fileName());
+				Pointer<Character> path = Pointer.pointerToWideCString(nativeLibraryFile.getAbsolutePath());
+
+				COMStatus.check(OLEAutomationLibrary.LoadTypeLib(path, ppTypeLib));
+				// TODO check TLB GUID or stop when IID was not found in TLB?
+			}
+
+			Pointer<Pointer<ITypeInfo>> ppTypeInfo = Pointer.allocatePointer(ITypeInfo.class);
+			COMStatus.check(ppTypeLib.get().get().GetTypeInfoOfGuid(getIID(cls), ppTypeInfo));
+
+			result = new DispatchInfo(cls, ppTypeInfo.get().get());
+			dispatchInfoCache.put(cls, result);
+		}
+		return result;
+	}
+
+	public static int adviseEvent(IUnknown source, IDispatch listener) {
+		IConnectionPointContainer connectionPointContainer = source.QueryInterface(IConnectionPointContainer.class);
+		Pointer<Pointer<IConnectionPoint>> pConnectionPoint = Pointer.allocatePointer(IConnectionPoint.class);
+		COMStatus.check(connectionPointContainer.FindConnectionPoint(getIID(listener.getClass()), pConnectionPoint));
+		Pointer<Integer> cookie = Pointer.allocateInt();
+		COMStatus.check(pConnectionPoint.get().get().Advise(Pointer.getPointer(listener.QueryInterface(IUnknown.class)), cookie));
+		return cookie.getInt();
+	}
+
+	public static boolean unadviseEvent(IUnknown source, IDispatch listener) {
+		IConnectionPointContainer connectionPointContainer = source.QueryInterface(IConnectionPointContainer.class);
+		Pointer<Pointer<IConnectionPoint>> pConnectionPoint = Pointer.allocatePointer(IConnectionPoint.class);
+		COMStatus.check(connectionPointContainer.FindConnectionPoint(COMRuntime.getIID(listener.getClass()), pConnectionPoint));
+		IConnectionPoint connectionPoint = pConnectionPoint.get().get();
+		Pointer<Pointer<IEnumConnections>> pEnumConnections = Pointer.allocatePointer(IEnumConnections.class);
+		COMStatus.check(connectionPoint.EnumConnections(pEnumConnections));
+		IEnumConnections enumConnections = pEnumConnections.get().get();
+		Pointer<CONNECTDATA> pConnectData = Pointer.allocate(CONNECTDATA.class);
+		while (COMStatus.check(enumConnections.Next(1, pConnectData, null))) {
+			if (pConnectData.get().pUnk().get() == listener) {
+				COMStatus.check(connectionPoint.Unadvise(pConnectData.get().dwCookie()));
+				return true;
+			}
+		}
+		return false;
+	}
 }
