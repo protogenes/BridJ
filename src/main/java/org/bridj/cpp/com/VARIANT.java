@@ -381,8 +381,8 @@ public class VARIANT extends StructObject {
                  * C type : SCODE
                  */
                 @Field(8)
-                public long scode() {
-                    return this.io.getLongField(this, 8);
+                public int scode() {
+                    return this.io.getIntField(this, 8);
                 }
 
                 /**
@@ -390,8 +390,8 @@ public class VARIANT extends StructObject {
                  * C type : SCODE
                  */
                 @Field(8)
-                public __VARIANT_NAME_3_union scode(long scode) {
-                    this.io.setLongField(this, 8, scode);
+                public __VARIANT_NAME_3_union scode(int scode) {
+                    this.io.setIntField(this, 8, scode);
                     return this;
                 }
                 /// C type : SCODE

@@ -2962,7 +2962,7 @@ public class COMStatus extends RuntimeException {
 				inStream.close();
 
 				for (Entry<Object, Object> entry : msg.entrySet()) {
-					int hr = Integer.parseInt(String.valueOf(entry.getKey()), 16);
+					int hr = (int) Long.parseLong(String.valueOf(entry.getKey()), 16);
 					DESCRIPTIONS.put(hr, String.valueOf(entry.getValue()));
 				}
 			} catch (Exception e) {

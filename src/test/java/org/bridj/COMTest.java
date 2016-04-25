@@ -35,9 +35,6 @@ import org.bridj.cpp.com.*;
 import org.bridj.cpp.com.shell.IShellWindows;
 import org.junit.Test;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import static org.junit.Assert.*;
 
 public class COMTest {
@@ -49,7 +46,7 @@ public class COMTest {
 	public void shellFolder() {
 		if (!hasCOM)
             return;
-        try {
+
 	        COMRuntime.initialize();
             IShellWindows win = COMRuntime.newInstance(IShellWindows.class);
             assertNotNull(win);
@@ -59,10 +56,7 @@ public class COMTest {
             assertNotNull(win);
             win.Release();
             COMRuntime.uninitialize();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(COMTest.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        }
+
 	}
 	
 	static class SomeUnknown extends IUnknown {

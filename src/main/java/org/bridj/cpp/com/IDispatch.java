@@ -137,8 +137,8 @@ public class IDispatch extends IUnknown {
 		}
 
 		@Field(8)
-		public long scode() {
-			return this.io.getLongField(this, 8);
+		public int scode() {
+			return this.io.getIntField(this, 8);
 		}
 
 		@Convention(Style.StdCall)

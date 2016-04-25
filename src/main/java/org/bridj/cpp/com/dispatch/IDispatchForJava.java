@@ -100,8 +100,19 @@ public class IDispatchForJava extends IDispatch implements AggregatableIUnknown 
 		if (methodInfo == null) {
 			return COMStatus.DISP_E_MEMBERNOTFOUND;
 		}
+
+		if (puArgErr == null) {
+			puArgErr = Pointer.allocateInt();
+		}
+		if (pVarResult == null) {
+			pVarResult = Pointer.allocate(VARIANT.class);
+		}
 		try {
-			return methodInfo.invoke(this, pDispParams, pVarResult);
+			Pointer<VARIANT> result = methodInfo.invoke(this, pDispParams, puArgErr);
+			if (result != null && pVarResult != null) {
+				OLEAutomationLibrary.VariantCopy(pVarResult, result);
+			}
+			return COMStatus.S_OK;
 		} catch (InvocationTargetException e) {
 			return COMStatus.DISP_E_EXCEPTION;
 		} catch (IllegalAccessException e) {

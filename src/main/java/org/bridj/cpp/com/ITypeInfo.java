@@ -485,7 +485,7 @@ public class ITypeInfo extends org.bridj.cpp.com.IUnknown {
 		 * C type : SCODE*
 		 */
 		@Field(1)
-		public Pointer<Long> lprgscode() {
+		public Pointer<Integer> lprgscode() {
 			return this.io.getPointerField(this, 1);
 		}
 
@@ -493,7 +493,7 @@ public class ITypeInfo extends org.bridj.cpp.com.IUnknown {
 		 * C type : SCODE*
 		 */
 		@Field(1)
-		public FUNCDESC lprgscode(Pointer<Long> lprgscode) {
+		public FUNCDESC lprgscode(Pointer<Integer> lprgscode) {
 			this.io.setPointerField(this, 1, lprgscode);
 			return this;
 		}

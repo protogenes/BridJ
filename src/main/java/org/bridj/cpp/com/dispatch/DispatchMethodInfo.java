@@ -211,39 +211,36 @@ public class DispatchMethodInfo {
 		return functionCount;
 	}
 
-	public int invoke(IDispatch target, Pointer<DISPPARAMS> pDispParams, Pointer<VARIANT> result) throws InvocationTargetException, IllegalAccessException, COMStatus {
+	public Pointer<VARIANT> invoke(IDispatch target, Pointer<DISPPARAMS> pDispParams, Pointer<Integer> puArgErr) throws InvocationTargetException, IllegalAccessException, COMStatus {
 		Object[] parameters = new Object[method.getParameterTypes().length];
-		Pointer<?> retval = null;
-		if (retvalType != null) {
-			retval = Pointer.allocate(retvalType);
+		if (retvalIndex >= 0) {
+			parameters[retvalIndex] = Pointer.allocate(retvalType);
 		}
 
-		Pointer<VARIANT> param = Pointer.allocate(VARIANT.class);
-		Pointer<Integer> puArgErr = Pointer.allocateInt();
+		Pointer<VARIANT>[] variantArray = new Pointer[parameters.length];
 		int p = 0;
 		for (int i = 0; i < parameters.length; i++) {
-			if (i == retvalIndex) {
-				parameters[i] = retval;
-			} else {
+			// don't allocate as array so that each variant is released by GC
+			Pointer<VARIANT> pVariant = Pointer.allocate(VARIANT.class);
+			variantArray[i] = pVariant;
+			if (i != retvalIndex) {
 				FlagSet<VARENUM> parameterType = parameterTypes[i];
-				COMStatus.check(OLEAutomationLibrary.DispGetParam(pDispParams, p++, (short) parameterType.value(), param, puArgErr));
-				parameters[i] = rawValue(param.get());
+				COMStatus.check(OLEAutomationLibrary.DispGetParam(pDispParams, p, (short) parameterType.value(), pVariant.next(p), puArgErr));
+				parameters[i] = rawValue(pVariant.get());
+				++p;
 			}
 		}
 
-		int hr = COMStatus.S_OK;
 		Object invoke = method.invoke(target, parameters);
 		if (invoke instanceof Number) {
 			COMStatus.check(((Number) invoke).intValue());
 		}
 
-		if (result != null) {
-			OLEAutomationLibrary.VariantInit(result);
-			if (retval != null) {
-				result.get().setValue(retval.get());
-			}
+		if (retvalIndex >= 0) {
+			variantArray[retvalIndex].get().setValue(((Pointer<?>) parameters[retvalIndex]).get());
+			return variantArray[retvalIndex];
 		}
-		return hr;
+		return null;
 	}
 
 	private Object rawValue(VARIANT variant) {

@@ -32,3 +32,5 @@ dalvik
 .classpath
 .project
 .settings
+.idea
+*.iml
